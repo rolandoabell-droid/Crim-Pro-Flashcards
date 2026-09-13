@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- iPhone Notch & Safe Area Optimization -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Standalone App Flags for iOS Home Screen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CrimPro Flashcards">
+
+  <title>Criminal Procedure Flashcards</title>
+
+  <!-- React & Babel Standalone Compilers -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding-top: env(safe-area-inset-top, 20px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+      background-color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1f2430;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+
+    const CARDS = [{"section": "Constitutional Foundations", "term": "The Bill of Rights", "definition": "The Bill of Rights was originally written to restrict only the federal government, not state or local governments."}, {"section": "Constitutional Foundations", "term": "The Bill of Rights and the 14th Amendment", "definition": "Through the 14th Amendment, parts of the Bill of Rights have been applied to the states as well, because those rights are seen as basic to liberty and due process."}, {"section": "Constitutional Foundations", "term": "Portions of the Bill of Rights Applied to the States", "definition": "Parts of the 4th, 5th, 6th, and 8th Amendments have been made to apply to the states."}, {"section": "Constitutional Foundations", "term": "Portions of the 4th Amendment Applied to States", "definition": "The Exclusionary Rule and the prohibition against unreasonable searches and seizures are two 4th Amendment protections that have been applied to the states."}, {"section": "Warrants", "term": "Requirements for a Warrant", "definition": "A valid warrant must be issued by a neutral and detached magistrate, based on probable cause, be specific, be executed by police, be executed after a proper announcement (unless there's an emergency), and be executed within a reasonable time."}, {"section": "Warrants", "term": "Neutral and Detached Magistrates", "definition": "The judge who signs a warrant cannot be someone involved in law enforcement or the investigation."}, {"section": "Warrants", "term": "Warrants and Probable Cause", "definition": "A warrant must rest on a police officer's sworn affidavit presenting adequate facts to support probable cause --- an officer's bare conclusions are not enough."}, {"section": "Warrants", "term": "Warrants and Specificity", "definition": "A warrant must be reasonably specific about the place to be searched and the items sought."}, {"section": "Warrants", "term": "Execution of Warrants and Proper Announcement", "definition": "Police generally must knock and announce who they are and why they are there before executing a warrant, unless circumstances suggest this would be dangerous or lead to lost evidence."}, {"section": "Warrants", "term": "Executing Warrants Within a Reasonable Time", "definition": "A warrant must be executed within a reasonable time after it is issued, because probable cause can go stale."}, {"section": "Warrants", "term": "Challenging Evidence Obtained Under a Warrant", "definition": "If a warrant contains a material, false statement that was included deliberately or recklessly, evidence obtained under it is inadmissible."}, {"section": "Warrants", "term": "Good Faith Reliance on an Invalid Warrant", "definition": "Evidence found by police who reasonably and honestly relied on a warrant that later turns out not to have been based on probable cause is still admissible."}, {"section": "Warrants", "term": "Issuance of Warrants", "definition": "A warrant must be issued by a neutral, detached magistrate based on a sworn, written affidavit."}, {"section": "Warrants", "term": "Particularity in Warrants", "definition": "The warrant must specifically describe the place to be searched and items/persons to be seized --- no general, exploratory rummaging."}, {"section": "Warrants", "term": "Exigent Circumstances", "definition": "Warrantless entry justified by urgent need: hot pursuit of a fleeing felon, imminent destruction of evidence, or emergency aid/danger to life."}, {"section": "Warrants", "term": "Automobile Exception", "definition": "Probable cause to believe a readily mobile vehicle contains evidence/contraband justifies a warrantless search of the vehicle and any container that could hold the object sought."}, {"section": "Warrants", "term": "Borders and Checkpoints", "definition": "Routine border searches (and functional equivalents) require no warrant, probable cause, or suspicion; brief suspicionless checkpoints are valid if for a limited purpose other than general crime control (e.g., sobriety, licenses/registration, fixed immigration checkpoints)."}, {"section": "Warrants", "term": "Lawful Access", "definition": "Officers must have a lawful right of physical access to seize an item (element of plain-view seizure)."}, {"section": "Searches --- General Principles", "term": "Searches", "definition": "A search occurs when a government agent intrudes on someone's reasonable expectation of privacy."}, {"section": "Searches --- General Principles", "term": "Standing to Raise a 4th Amendment Claim", "definition": "To challenge a search under the 4th Amendment, a person must own the area searched or have a right to possess it."}, {"section": "Searches --- General Principles", "term": "Reasonable Expectation of Privacy", "definition": "Courts examine the totality of the circumstances to decide whether a person had a reasonable expectation of privacy."}, {"section": "Searches --- General Principles", "term": "Warrants and Searches --- the Exceptions", "definition": "Police generally need a valid warrant to intrude on a reasonable expectation of privacy, except in situations like plain view, consent, the automobile exception, searches incident to arrest, investigatory detentions, hot pursuit, danger of losing evidence, emergencies, border searches, INS inspections, and situations involving unreliable or uninvited listeners or pen registers."}, {"section": "Searches --- General Principles", "term": "Plain View and Search Warrants", "definition": "No warrant is required for evidence that is in plain view, because there's no reasonable expectation of privacy in something clearly visible to the public."}, {"section": "Searches --- General Principles", "term": "Search Warrants and Consent", "definition": "Police may conduct a warrantless search if voluntary and intelligent permission is given by someone with authority to give it."}, {"section": "Searches --- General Principles", "term": "Automobiles and Warrantless Searches", "definition": "If police have probable cause to believe a car contains evidence, and the evidence could disappear because the car is mobile, a warrantless search is allowed."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches Incident to Lawful Arrest", "definition": "When police make an arrest, they may search the arrestee and areas within reach, without needing probable cause for the search itself."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Investigatory Detentions", "definition": "If police detain someone for investigation, they may frisk the person only if there is a reasonable belief the person is armed."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Hot Pursuit", "definition": "Police may search any place reasonable while in hot pursuit of a fleeing felon, without a warrant."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and the Danger of Losing Evidence", "definition": "If there is a reasonable fear that evidence will be lost, police may seize it immediately without a warrant."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Emergencies", "definition": "In a true emergency, any area may be searched without a warrant."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Borders", "definition": "Warrants are not required for searches at national borders, or their equivalents like international airports."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and the Immigration and Naturalization Service (INS)", "definition": "The INS may check employees of a business to determine citizenship, without a warrant."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Unreliable Listeners", "definition": "People are under no obligation to keep secret what someone else tells them, absent a privilege (like attorney-client)."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Uninvited Listeners", "definition": "A speaker who makes no good-faith effort to protect a conversation cannot object if someone overhears it and it's used as evidence."}, {"section": "Searches --- General Principles", "term": "Warrantless Searches and Pen Registers", "definition": "Pen register records --- which show numbers dialed, not conversation content --- are admissible without a warrant."}, {"section": "Searches --- General Principles", "term": "State Action", "definition": "The 4th Amendment restrains only government actors; it does not apply to searches by purely private individuals."}, {"section": "Searches --- General Principles", "term": "Private Actors", "definition": "A private person's search, even if illegal or unethical, does not implicate the 4th Amendment unless done at the direction of, or with the knowledge and acquiescence of, the government."}, {"section": "Searches --- General Principles", "term": "Surveillance Technology", "definition": "Using sense-enhancing technology not in general public use to explore details of a home that would otherwise require physical entry is a search (Kyllo --- thermal imaging); physically attaching a GPS device is a search via trespass (Jones); accessing historical cell-site location records is a search requiring a warrant (Carpenter)."}, {"section": "Searches --- General Principles", "term": "Overheard Conversations", "definition": "No reasonable expectation of privacy in statements knowingly exposed to another person who may repeat them to police (assumption-of-risk doctrine), including conversations secretly recorded by that listener (White)."}, {"section": "Searches --- General Principles", "term": "Police Informants", "definition": "Using undercover agents/informants to gather information is not a search --- a person assumes the risk that someone they confide in is (or will become) a government informant."}, {"section": "Searches --- General Principles", "term": "Open Fields", "definition": "No reasonable expectation of privacy in open fields beyond the curtilage, even if fenced or posted 'No Trespassing' (Oliver)."}, {"section": "Searches --- General Principles", "term": "Curtilage", "definition": "Area immediately surrounding and intimately tied to the home, treated as part of the home; determined by the Dunn factors: (1) proximity to home, (2) whether within an enclosure surrounding the home, (3) nature of the use, (4) steps taken to shield from observation."}, {"section": "Administrative Searches", "term": "Administrative Agencies and Warrants", "definition": "Administrative agencies are generally subject to the same warrant requirements as police."}, {"section": "Administrative Searches", "term": "Administrative Agencies and Exceptions to the Warrant Requirement", "definition": "Agencies do not need a warrant to search students, airline passengers, probationers' homes, government employees' desks and files, contaminated food, highly regulated industries, or under general and neutral enforcement plans."}, {"section": "Administrative Searches", "term": "Warrantless Searches and Public School Children", "definition": "School officials only need reasonable grounds to search a student, their desk, or locker --- no warrant required."}, {"section": "Administrative Searches", "term": "Warrantless Searches and Airline Passengers", "definition": "Searches of airline passengers before boarding do not require a warrant."}, {"section": "Administrative Searches", "term": "Probationers and Warrantless Searches", "definition": "Generally, no warrant is needed to search a probationer's home, since consenting to such searches is often a condition of probation."}, {"section": "Administrative Searches", "term": "Parolees and Warrantless Searches", "definition": "By statute, parolees must submit to warrantless searches of their person, property, and residence."}, {"section": "Administrative Searches", "term": "Warrantless Searches and Government Employees' Desks and Files", "definition": "A reasonable search of a government employee's desk or files is allowed without a warrant if it is work-related, involves job-related misconduct, or is triggered by non-investigatory motives."}, {"section": "Administrative Searches", "term": "Warrantless Searches and Contaminated Food", "definition": "Administrative agencies may seize food unfit for human consumption without a warrant."}, {"section": "Administrative Searches", "term": "Warrantless Searches and Highly Regulated Industries", "definition": "Highly regulated industries (like liquor, firearms, junkyards, and mining) may be searched by administrative agencies without a warrant."}, {"section": "Administrative Searches", "term": "Warrantless Searches and General and Neutral Enforcement Plans", "definition": "Agencies may conduct inspections without a warrant under a general and neutral enforcement plan, as long as it doesn't amount to selective enforcement."}, {"section": "Administrative Searches", "term": "Regulatory Inspections", "definition": "Inspections of closely regulated industries, or code-enforcement inspections, may proceed on less than probable cause (e.g., an area warrant based on neutral criteria), reflecting a reduced privacy expectation."}, {"section": "Administrative Searches", "term": "Governmental Supervision", "definition": "Warrantless/suspicionless searches of probationers, parolees, students, and government employees are evaluated under a reasonableness balancing test given diminished privacy expectations and special governmental needs."}, {"section": "Evidence Obtained by Improper Means", "term": "Searches and Methods That 'Shock the Conscience'", "definition": "Evidence obtained by methods that 'shock the conscience' is not admissible."}, {"section": "Evidence Obtained by Improper Means", "term": "Criteria for the 'Shock the Conscience' Test", "definition": "Courts weigh how probable it is the evidence will be found, how significant the evidence is, how shocking the method is, and whether there are alternative methods."}, {"section": "Evidence Obtained by Improper Means", "term": "Seizures and Owners of Property Used in a Crime", "definition": "Owners of property used to commit a crime have no right to due process before a seizure."}, {"section": "Evidence Obtained by Improper Means", "term": "Forfeitures and Owners of Property Used in a Crime", "definition": "Illegally obtained evidence is not admissible at trial."}, {"section": "Evidence Obtained by Improper Means", "term": "Fruit of the Poisonous Tree", "definition": "Evidence that would not have been obtained but for improper conduct is also not admissible."}, {"section": "Evidence Obtained by Improper Means", "term": "Purpose Behind the Exclusionary Rule", "definition": "The rule exists to protect individual rights by removing any benefit police could gain from violating them."}, {"section": "Evidence Obtained by Improper Means", "term": "Situations Where Illegally Obtained Evidence May Still Be Admitted", "definition": "Illegally obtained evidence may still come in if it resulted from the free will of the defendant, an independent source, or it would have been inevitably discovered."}, {"section": "Evidence Obtained by Improper Means", "term": "'Free Will' of Defendant", "definition": "If a defendant gives evidence of his own free will, not motivated by the illegal action, it is admissible."}, {"section": "Evidence Obtained by Improper Means", "term": "Independent Source", "definition": "Evidence from a source unrelated to the illegal act is admissible."}, {"section": "Evidence Obtained by Improper Means", "term": "Inevitable Discovery", "definition": "Evidence that would have been discovered anyway, even without the illegal act, is admissible."}, {"section": "Evidence Obtained by Improper Means", "term": "Exceptions to the Exclusionary Rule", "definition": "The Exclusionary Rule does not apply to grand juries, impeachment, violations of internal agency rules, civil proceedings, good faith reliance, or harmless error."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Grand Juries", "definition": "Because a grand jury's function is to gather information, not impose penalties, the Exclusionary Rule does not apply there."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Impeachment", "definition": "An illegally obtained but voluntary confession may be used to impeach a witness's testimony."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Violations of Internal Agency Rules", "definition": "The Rule protects constitutionally guaranteed rights, not mere internal agency procedures."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Civil Proceedings", "definition": "Unless the proceeding involves punishment, illegally obtained evidence may be used in a civil case."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Harmless Error", "definition": "If the government proves beyond a reasonable doubt that the defendant would have been convicted without the illegally obtained evidence, the conviction stands."}, {"section": "Evidence Obtained by Improper Means", "term": "Exclusionary Rule and Good Faith Reliance", "definition": "Suppressing evidence obtained in good faith wouldn't achieve the rule's purpose, so such evidence can still be admitted."}, {"section": "Evidence Obtained by Improper Means", "term": "How to Assert the Exclusionary Rule", "definition": "Whether evidence was illegally obtained is decided at a pre-trial suppression hearing, held outside the presence of the jury."}, {"section": "Evidence Obtained by Improper Means", "term": "Defendants and the Exclusionary Rule", "definition": "The Exclusionary Rule may not be used to block a defendant from presenting probative evidence in his own defense."}, {"section": "Arrests and Detentions", "term": "Arrest", "definition": "An arrest is placing someone in custody where they are not free to leave."}, {"section": "Arrests and Detentions", "term": "Arrests and Warrants", "definition": "Warrants are not required for arrests in public places, but generally are required for arrests in someone's home, absent exigent circumstances."}, {"section": "Arrests and Detentions", "term": "Warrantless Arrests and Common Law", "definition": "Police may arrest without a warrant if there is a reasonable belief a felony was committed by the arrestee, or if a misdemeanor occurred in the officer's conscious presence."}, {"section": "Arrests and Detentions", "term": "Detentions for Purposes of Investigation", "definition": "Police may briefly detain someone for investigation if they have a reasonable suspicion, supported by articulable facts, that the person has information about criminal activity --- no warrant needed."}, {"section": "Arrests and Detentions", "term": "Investigatory Detentions vs. Arrest", "definition": "A brief and specific detention is more likely to be treated as a detention (not an arrest), meaning no warrant is necessary."}, {"section": "Arrests and Detentions", "term": "Automobile Stops", "definition": "Police generally may not stop a car unless they have a reasonable belief that the driver violated a law."}, {"section": "Arrests and Detentions", "term": "Statutes Regarding Loitering", "definition": "Loitering statutes requiring 'credible and reliable' identification are generally considered unconstitutionally vague."}, {"section": "Arrests and Detentions", "term": "Stop (Terry Stop)", "definition": "Brief investigative detention justified by reasonable, articulable suspicion under the totality of circumstances (Terry v. Ohio)."}, {"section": "Arrests and Detentions", "term": "Frisk (Terry Frisk)", "definition": "Limited pat-down of outer clothing for weapons, permitted during a valid stop when officer reasonably suspects the person is armed and dangerous."}, {"section": "Arrests and Detentions", "term": "Custody", "definition": "Restraint on freedom of movement to the degree associated with formal arrest, judged objectively (would a reasonable person feel free to leave); triggers Miranda when paired with interrogation."}, {"section": "Confessions and Interrogation", "term": "Confessions and Admissibility", "definition": "For a confession to be admissible, it must be reliable and obtained by proper means."}, {"section": "Confessions and Interrogation", "term": "Confessions and Reliability", "definition": "Confessions must be voluntary, made by someone with the capacity to appreciate what they are doing, judged by the totality of the circumstances."}, {"section": "Confessions and Interrogation", "term": "Confessions and the 'Proper Means'", "definition": "Courts consider factors like police action, Miranda warnings, right to counsel, waiver, grand jury context, public safety, impeachment, and whether it followed an earlier invalid confession."}, {"section": "Confessions and Interrogation", "term": "Confessions and Police Action", "definition": "A confession not given in response to police action is admissible as long as capacity and voluntariness are met."}, {"section": "Confessions and Interrogation", "term": "Confessions and Miranda Warnings", "definition": "Before a custodial interrogation, police must tell a suspect they have the right to remain silent, that anything said can be used against them, they have a right to an attorney, and one will be appointed if they can't afford one."}, {"section": "Confessions and Interrogation", "term": "Confessions and the Right to Counsel", "definition": "After arrest, a person has a right to counsel at any interrogation."}, {"section": "Confessions and Interrogation", "term": "Confessions and Waivers", "definition": "If a person with capacity and appreciation of the situation voluntarily waives their rights and confesses, the confession is admissible."}, {"section": "Confessions and Interrogation", "term": "Confessions and Grand Juries", "definition": "Witnesses before a grand jury may not refuse to testify or claim a right to counsel in the room."}, {"section": "Confessions and Interrogation", "term": "Confessions and Public Safety", "definition": "If questioning is motivated by an immediate fear for public safety, a confession may be admitted even without Miranda warnings or counsel."}, {"section": "Confessions and Interrogation", "term": "Confessions and Impeachment", "definition": "A reliable, voluntary confession given before Miranda rights were read is admissible only for impeachment."}, {"section": "Confessions and Interrogation", "term": "Confessions Made Subsequent to Invalid Confessions", "definition": "A confession made after Miranda warnings is not automatically invalid just because an earlier confession, made before those warnings, occurred."}, {"section": "Confessions and Interrogation", "term": "Confessions and 'Fruit of the Poisonous Tree'", "definition": "Courts have generally held that physical evidence discovered from an invalid confession may still be admissible, even though the confession itself is not."}, {"section": "Confessions and Interrogation", "term": "Voluntariness of Confessions", "definition": "Due process requires a confession be the product of free and rational choice, judged by the totality of circumstances (age, education, interrogation length/conditions, threats/promises)."}, {"section": "Confessions and Interrogation", "term": "Police Coercion", "definition": "Police overreaching (physical force, threats, deprivation, or psychologically coercive tactics) that overbears the suspect's will renders a confession involuntary."}, {"section": "Confessions and Interrogation", "term": "Custodial Interrogation", "definition": "Warnings required only when a suspect is in custody (not free to leave) AND subject to interrogation (express questioning or its functional equivalent)."}, {"section": "Confessions and Interrogation", "term": "Content of Miranda Warnings", "definition": "Right to remain silent; anything said can be used against you; right to an attorney; attorney appointed if indigent --- required before custodial interrogation."}, {"section": "Confessions and Interrogation", "term": "Invocation of Miranda Rights", "definition": "A clear, unambiguous invocation of the right to silence or to counsel requires questioning to cease; invoking counsel bars further police-initiated interrogation until counsel is present or the suspect reinitiates."}, {"section": "Confessions and Interrogation", "term": "Successive Confessions", "definition": "Admissibility of a second, warned confession following an earlier unwarned one turns on whether curative measures were used and whether the initial Miranda failure was deliberate (Missouri v. Seibert --- deliberate two-step; Oregon v. Elstad --- good-faith failure)."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "The Juvenile Justice System", "definition": "The juvenile system is designed to rehabilitate, not to punish, minors."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Juveniles and Delinquency Hearings", "definition": "At a delinquency hearing, juveniles get the same rights as adults, except there is no right to a jury."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Equal Protection, Indigency, and Fines", "definition": "An indigent (poor) defendant cannot be imprisoned simply because they are unable to pay a fine."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Pretrial Hearings and Detentions", "definition": "Before significant restraints on liberty, a defendant is entitled to a determination that probable cause exists."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "What Constitutes a Probable Cause Determination", "definition": "Probable cause may be established by an arrest warrant, a prior indictment, or an informal hearing."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "What Constitutes a Significant Restraint on Liberty", "definition": "Examples include incarceration, imposing bail, and pretrial restrictions --- but being released on one's own recognizance usually does not count."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Post Probable Cause Appearance", "definition": "Soon after probable cause is established, the defendant is brought before a magistrate, who explains rights, appoints counsel if needed, and considers bail."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Bail Issues", "definition": "Bail should be reasonable; a denial or the amount of bail can be appealed immediately; and bail should almost always be granted unless it's a capital offense."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Bail Considerations", "definition": "Bail's purpose is not to punish, but to ensure the defendant appears for trial, considering the totality of the circumstances: past behavior on bail, severity of the crime, potential sentence, and threat to society."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Pre-trial Incarceration", "definition": "Any reasonable security measure may be used on people awaiting trial."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Determinations of Probable Cause to Prosecute", "definition": "Charges come either from a grand jury indictment or from a prosecutor filing charges directly, depending on the jurisdiction."}, {"section": "Juveniles, Indigency, and Pretrial Process", "term": "Prosecutors and Disclosure", "definition": "Prosecutors must turn over evidence that tends to indicate the defendant's innocence."}, {"section": "Speedy Trial and Identification Procedures", "term": "Speedy Trial", "definition": "Defendants are entitled to a reasonably speedy trial."}, {"section": "Speedy Trial and Identification Procedures", "term": "Reasonableness and Speedy Trials", "definition": "Courts weigh the length of the delay, the reason for the delay, whether the defendant objected, and whether the defendant was prejudiced."}, {"section": "Speedy Trial and Identification Procedures", "term": "When One Is Entitled to a Speedy Trial", "definition": "The right attaches once a person is arrested or charged."}, {"section": "Speedy Trial and Identification Procedures", "term": "Remedy for Violation of the Right to a Speedy Trial", "definition": "If the right to a speedy trial is violated, the case must be dismissed."}, {"section": "Speedy Trial and Identification Procedures", "term": "Pre-trial Personal Identifications", "definition": "After being charged, a suspect is entitled to have an attorney present for a 'show up' or 'line up'."}, {"section": "Speedy Trial and Identification Procedures", "term": "Pre-trial Non-Personal Identification", "definition": "Police are not required to allow an attorney to be present when a witness is shown photographs for identification."}, {"section": "Speedy Trial and Identification Procedures", "term": "Physical Evidence and the Right to an Attorney", "definition": "There is no right to counsel when police obtain physical evidence (like blood, voice samples, or fingerprints) from a defendant."}, {"section": "Speedy Trial and Identification Procedures", "term": "Due Process and Identifications", "definition": "An identification is inadmissible only if it was unnecessarily prejudicial and substantially likely to be unreliable."}, {"section": "Speedy Trial and Identification Procedures", "term": "Prejudicial Identifications", "definition": "A tainted pre-trial identification can make an in-court identification inadmissible, though in-court IDs are usually admissible if considered independent."}, {"section": "Speedy Trial and Identification Procedures", "term": "Test for a Tainted In-Court Identification", "definition": "An in-court identification must be based on factors other than the earlier prejudicial identification."}, {"section": "Speedy Trial and Identification Procedures", "term": "Defendant's Burden with Tainted Identifications", "definition": "The defendant has the burden to show the pre-trial ID was unreasonably prejudicial and unreliable."}, {"section": "Speedy Trial and Identification Procedures", "term": "Government's Burden with Tainted Identifications", "definition": "Once the defendant makes that showing, the burden shifts to the government to prove the in-court ID was based on an independent source."}, {"section": "Speedy Trial and Identification Procedures", "term": "Critical Stages of Prosecution", "definition": "Right attaches, post-charge, at any stage where substantial rights may be affected (post-indictment lineup, arraignment, plea negotiations, trial, sentencing)."}, {"section": "Speedy Trial and Identification Procedures", "term": "Ineffective Assistance of Counsel", "definition": "Strickland two-prong test: (1) counsel's performance fell below an objective standard of reasonableness, AND (2) a reasonable probability the deficiency changed the outcome (prejudice)."}, {"section": "Speedy Trial and Identification Procedures", "term": "Effect of Denial of Counsel", "definition": "Complete denial of counsel at a critical stage is structural error --- automatic reversal, no prejudice showing required."}, {"section": "Speedy Trial and Identification Procedures", "term": "Length of Delay (Speedy Trial)", "definition": "Delay must be presumptively prejudicial to trigger the balancing analysis at all."}, {"section": "Speedy Trial and Identification Procedures", "term": "Assertion of Right (Speedy Trial)", "definition": "Whether and when the defendant asserted the right is a weighed factor."}, {"section": "Speedy Trial and Identification Procedures", "term": "Prejudice from Delay (Speedy Trial)", "definition": "Includes oppressive pretrial incarceration, anxiety/concern, and impairment of the defense."}, {"section": "Speedy Trial and Identification Procedures", "term": "Live Lineups", "definition": "Live identification procedure; post-indictment lineups are a critical stage requiring counsel."}, {"section": "Speedy Trial and Identification Procedures", "term": "Showup Identifications", "definition": "One-on-one identification (suspect shown alone); inherently suggestive but allowed if reliable under the circumstances."}, {"section": "Speedy Trial and Identification Procedures", "term": "Photo Arrays", "definition": "Presentation of photographs (including of the suspect) for identification; not a critical stage (no counsel right), but must avoid undue suggestiveness."}, {"section": "Speedy Trial and Identification Procedures", "term": "Suggestive vs. Reliable Identifications", "definition": "Due process excludes identifications from unnecessarily suggestive procedures unless independently reliable under the totality of circumstances (Biggers/Brathwaite factors: opportunity to view, degree of attention, accuracy of prior description, level of certainty, time between crime and identification)."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Competency and Standing Trial", "definition": "A defendant is incompetent unless they understand the facts and charges against them, understand the proceedings, and can work with their attorney."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Judges and Competency of a Defendant", "definition": "A judge has an obligation to raise the issue of competency if it appears to be a concern."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Incompetent Defendants", "definition": "Incompetent defendants may be briefly detained in a mental institution for evaluation and treatment, but longer detention requires a civil commitment proceeding."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Burden of Proof", "definition": "In a criminal case, the state must prove its case beyond a reasonable doubt."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Plea Bargaining", "definition": "A defendant and prosecution may form a binding contract, where the defendant performs an act in exchange for a lesser charge."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Double Jeopardy and Plea Agreements", "definition": "Double jeopardy protections may be waived as part of a valid plea; breach/withdrawal disputes analyzed under contract-like principles."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Validity of Guilty Plea", "definition": "A guilty plea must be knowing, voluntary, and intelligent, with the defendant understanding the charges and rights waived."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Binding Nature of Plea Agreements", "definition": "Contract-like exchange of a guilty plea for prosecutorial concessions; binding once accepted by the court."}, {"section": "Competency, Burden of Proof, and Plea Bargaining", "term": "Withdrawal of Guilty Pleas", "definition": "Pre-sentencing withdrawal allowed for a 'fair and just reason'; post-sentencing withdrawal typically requires a showing of manifest injustice."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Self-Incrimination", "definition": "People cannot be compelled to make statements that would incriminate them."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Prosecutor's Inability to Comment", "definition": "A prosecutor may not comment on a defendant's failure to testify, raise an alibi, or produce alibi witnesses."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Confrontation and Confessions of a Co-Defendant", "definition": "A co-defendant's confession implicating another defendant cannot be used unless the confessor submits to cross-examination."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Confrontation and Hearsay", "definition": "Hearsay --- an out-of-court statement offered to prove the truth of what it asserts --- violates the right to confront one's accusers."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Hearsay Exceptions", "definition": "Common recognized exceptions include admissions, ancient documents, business records, public records, dying declarations, family history, prior statements, judgments, church records, state of mind, physical condition, reputation, spontaneous declarations, vital statistics, and prior recorded statements of unavailable witnesses."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Testimonial Evidence", "definition": "Communications that explicitly or implicitly assert a fact or disclose information are testimonial and protected; physical evidence (blood, prints, voice/handwriting exemplars) is not testimonial."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Compelled Testimony", "definition": "Privilege bars government compulsion of incriminating testimonial statements, applicable in any proceeding (civil or criminal) where the answer could incriminate."}, {"section": "Self-Incrimination, Confrontation, and Hearsay", "term": "Adverse Inference of Silence", "definition": "Prosecution/court may not comment on or invite the jury to infer guilt from a defendant's silence or failure to testify at a criminal trial (Griffin v. California)."}, {"section": "Jury Trial Rights", "term": "Right to Trial by Jury", "definition": "Defendants are entitled to a jury trial only for serious offenses."}, {"section": "Jury Trial Rights", "term": "Serious Offenses", "definition": "Serious offenses are those carrying a potential sentence of more than six months, excluding juvenile proceedings."}, {"section": "Jury Trial Rights", "term": "Right to an Impartial Jury", "definition": "A defendant may get a change of venue or a new trial if the jury was tainted by pretrial publicity."}, {"section": "Jury Trial Rights", "term": "Civil Contempt and Jury Trials", "definition": "A witness jailed until he testifies may be held more than six months without a jury trial."}, {"section": "Jury Trial Rights", "term": "Post-Trial Criminal Contempt and the Right to a Jury", "definition": "A sentence of more than six months for punishment, imposed after trial, requires a jury."}, {"section": "Jury Trial Rights", "term": "During-Trial Contempt and the Right to a Jury", "definition": "A judge may sentence someone to more than six months for contempt during trial, as punishment, without a jury."}, {"section": "Jury Trial Rights", "term": "Number of Jurors", "definition": "There must be at least six jurors; serious crimes are generally tried by a jury of twelve."}, {"section": "Jury Trial Rights", "term": "Right to a Jury of One's Peers", "definition": "This means jurors are chosen from a group representative of the area, not that the actual jurors themselves must be representative."}, {"section": "Jury Trial Rights", "term": "Jurors and Political Views", "definition": "A juror may not be excluded for political views, unless those views would prevent following the court's instructions."}, {"section": "Jury Trial Rights", "term": "Jurors and Race", "definition": "It is inappropriate to raise race during jury selection, unless it's a major part of the offense or an interracial capital offense."}, {"section": "Jury Trial Rights", "term": "Confrontation Clause", "definition": "A defendant has a right to confront witnesses against him."}, {"section": "Jury Trial Rights", "term": "Public Trials", "definition": "Trials are open to the public, unless fairness dictates otherwise."}, {"section": "Jury Trial Rights", "term": "Pretrial Publicity and Impartial Jury", "definition": "Extensive prejudicial publicity may require change of venue, continuance, or extensive voir dire to secure an impartial jury."}, {"section": "Jury Trial Rights", "term": "Prejudice of Jury", "definition": "Defendant is entitled to a jury deciding solely on trial evidence, free of outside influence/bias."}, {"section": "Jury Trial Rights", "term": "Judicial Prejudice and Neutrality", "definition": "Due process requires a neutral, unbiased judge; actual bias or serious risk of bias (e.g., financial interest, prior prosecutorial role in the case) requires recusal."}, {"section": "Jury Trial Rights", "term": "Limited Access to Public Trial", "definition": "Not absolute; closure requires an overriding interest, narrowly tailored, with findings on the record (e.g., protecting a minor witness)."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Double Jeopardy", "definition": "A person may not be tried more than once for the same offense."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "When One Has Been Subjected to Trial", "definition": "A person has been subjected to trial once the jury is sworn or the first witness is sworn."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Double Jeopardy and Exceptions", "definition": "Exceptions include appeals, hung juries, and cases where a retrial is ordered."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Habeas Corpus", "definition": "A habeas corpus proceeding lets a prisoner contest the constitutionality of their confinement."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Requirements Prior to Habeas Corpus", "definition": "A person must show they raised the objection at trial (or had good reason not to), and that the error was outcome-determinative."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Lower Court Findings and Habeas Corpus", "definition": "Lower court findings of fact are generally deferred to, unless there is an abuse of discretion."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Attachment of Double Jeopardy (Timing)", "definition": "Jeopardy attaches when the jury is empaneled and sworn (jury trial) or when the first witness is sworn (bench trial)."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Nature of Proceeding (Double Jeopardy)", "definition": "Applies only to criminal prosecutions, not civil or administrative proceedings arising from the same conduct."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Dual Sovereignty Doctrine", "definition": "Dual sovereignty doctrine: separate state and federal (or different states') prosecutions for the same conduct do not violate double jeopardy."}, {"section": "Double Jeopardy and Habeas Corpus", "term": "Post-Conviction Review Restrictions", "definition": "Generally unavailable on federal habeas review of a fully-litigated 4th Amendment claim (Stone v. Powell)."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Appeals", "definition": "The Constitution does not guarantee a right to appeal, though some states provide an automatic right in certain situations."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Appeals and Indigency", "definition": "Indigent defendants must not be denied an appeal because of a lack of funds."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Post-Appeal Retrials", "definition": "After a successful appeal, a person may not be retried for a more serious offense."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Probation and Parole Revocation and the Right to Counsel", "definition": "There is no right to counsel at a revocation hearing unless the sentence is being made more severe, the defendant has a good-faith argument he didn't violate parole, or the issues are too complex."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Cruel and Unusual Punishment", "definition": "Courts may not impose a sentence significantly disproportionate to the crime."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Cruel and Unusual Punishment and the Death Penalty", "definition": "The death penalty cannot be a mandatory sentence; a jury must be able to weigh aggravating and mitigating circumstances."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Prison Regulations", "definition": "Prison officials may make any rule reasonably related to the safe and smooth operation of the prison."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Prisoners and the Right to Privacy", "definition": "Prisoners have no reasonable expectation of privacy."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Due Process and Prison Discipline", "definition": "There is no right to a hearing unless a prisoner loses good time or is placed in solitary confinement."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Rights of Prisoners", "definition": "Prisoners generally keep their rights unless those rights would affect safety or the smooth operation of the prison."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Post-Completion-of-Sentence Punishment", "definition": "States may deprive felons of the right to vote or hold office, even after their sentence is fully served."}, {"section": "Appeals, Sentencing, and Prisoners' Rights", "term": "Eight Amendment Prison Conditions", "definition": "Violate the 8th Amendment when they involve unnecessary and wanton infliction of pain, judged under a deliberate-indifference standard as to prison officials."}];
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function App() {
+      const sections = useMemo(() => {
+        const seen = [];
+        CARDS.forEach(c => { if (!seen.includes(c.section)) seen.push(c.section); });
+        return seen;
+      }, []);
+
+      const [activeSection, setActiveSection] = useState('All');
+      const [pos, setPos] = useState(0);
+      const [flipped, setFlipped] = useState(false);
+      const [known, setKnown] = useState({});
+      const [shuffleOn, setShuffleOn] = useState(false);
+
+      const deck = useMemo(() => {
+        const idxs = CARDS
+          .map((c, i) => ({ c, i }))
+          .filter(({ c }) => activeSection === 'All' || c.section === activeSection)
+          .map(({ i }) => i);
+        return shuffleOn ? shuffleArray(idxs) : idxs;
+      }, [activeSection, shuffleOn]);
+
+      useEffect(() => {
+        setPos(0);
+        setFlipped(false);
+      }, [activeSection, shuffleOn]);
+
+      const total = deck.length;
+      const currentIdx = deck[pos];
+      const current = CARDS[currentIdx];
+
+      const goNext = () => {
+        setFlipped(false);
+        setPos(p => (p + 1) % total);
+      };
+      const goPrev = () => {
+        setFlipped(false);
+        setPos(p => (p - 1 + total) % total);
+      };
+      const markKnown = (val) => {
+        setKnown(k => ({ ...k, [currentIdx]: val }));
+        goNext();
+      };
+      const resetProgress = () => {
+        setKnown({});
+        setPos(0);
+        setFlipped(false);
+      };
+
+      const knownCount = Object.values(known).filter(v => v === true).length;
+      const reviewCount = Object.values(known).filter(v => v === false).length;
+
+      if (total === 0) {
+        return <div style={{ padding: 24 }}>No cards in this section.</div>;
+      }
+
+      return (
+        <div style={{
+          maxWidth: 720,
+          margin: '0 auto',
+          padding: '10px 16px 32px',
+          width: '100%'
+        }}>
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <h1 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 4px', color: '#2d2a4a' }}>
+              Criminal Procedure — Legal Definitions
+            </h1>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>
+              {total} card{total !== 1 ? 's' : ''} in this set · Card {pos + 1} of {total}
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 16 }}>
+            <select
+              value={activeSection}
+              onChange={(e) => setActiveSection(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 10,
+                border: '1px solid #d8dae0',
+                fontSize: 13,
+                background: '#fff',
+                color: '#2d2a4a',
+                maxWidth: 280
+              }}
+            >
+              <option value="All">All Sections ({CARDS.length})</option>
+              {sections.map(s => {
+                const count = CARDS.filter(c => c.section === s).length;
+                return <option key={s} value={s}>{s} ({count})</option>;
+              })}
+            </select>
+
+            <button
+              onClick={() => setShuffleOn(s => !s)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 12px', borderRadius: 10,
+                border: '1px solid #d8dae0',
+                background: shuffleOn ? '#4f46e5' : '#fff',
+                color: shuffleOn ? '#fff' : '#2d2a4a',
+                fontSize: 13, cursor: 'pointer'
+              }}
+            >
+              <i data-lucide="shuffle" style={{ width: 14, height: 14 }}></i> Shuffle
+            </button>
+
+            <button
+              onClick={resetProgress}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 12px', borderRadius: 10,
+                border: '1px solid #d8dae0', background: '#fff', color: '#2d2a4a',
+                fontSize: 13, cursor: 'pointer'
+              }}
+            >
+              <i data-lucide="list-restart" style={{ width: 14, height: 14 }}></i> Reset
+            </button>
+          </div>
+
+          <div style={{ textAlign: 'center', fontSize: 12, color: '#6b7280', marginBottom: 10 }}>
+            {current.section}
+          </div>
+
+          <div
+            onClick={() => setFlipped(f => !f)}
+            style={{
+              perspective: '1200px',
+              cursor: 'pointer',
+              minHeight: 320,
+            }}
+          >
+            <div style={{
+              position: 'relative',
+              width: '100%',
+              minHeight: 320,
+              transformStyle: 'preserve-3d',
+              transition: 'transform 0.5s',
+              transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
+            }}>
+              {/* Front */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                backfaceVisibility: 'hidden',
+                background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
+                borderRadius: 16,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                padding: 28, textAlign: 'center',
+                boxShadow: '0 8px 24px rgba(79,70,229,0.25)'
+              }}>
+                <div style={{ fontSize: 11, letterSpacing: 1.5, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: 14 }}>
+                  Term
+                </div>
+                <div style={{ fontSize: 26, fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
+                  {current.term}
+                </div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 24 }}>
+                  Tap to reveal legal definition
+                </div>
+              </div>
+
+              {/* Back */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(180deg)',
+                background: '#fff',
+                border: '2px solid #4f46e5',
+                borderRadius: 16,
+                display: 'flex', flexDirection: 'column',
+                justifyContent: 'center',
+                padding: '24px 26px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                overflowY: 'auto'
+              }}>
+                <div style={{ fontSize: 11, letterSpacing: 1.5, color: '#9ca3af', textTransform: 'uppercase', marginBottom: 8, textAlign: 'center' }}>
+                  {current.term} — Legal Definition
+                </div>
+                <div style={{ fontSize: 15, lineHeight: 1.55, color: '#1f2430', textAlign: 'left' }}>
+                  {current.definition}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginTop: 20 }}>
+            <button onClick={goPrev} style={navBtn}>
+              <i data-lucide="chevron-left" style={{ width: 18, height: 18 }}></i>
+            </button>
+
+            <button onClick={() => markKnown(false)} style={{ ...actionBtn, background: '#fee2e2', color: '#b91c1c' }}>
+              <i data-lucide="x" style={{ width: 16, height: 16 }}></i> Review again
+            </button>
+
+            <button onClick={() => markKnown(true)} style={{ ...actionBtn, background: '#dcfce7', color: '#15803d' }}>
+              <i data-lucide="check" style={{ width: 16, height: 16 }}></i> Got it
+            </button>
+
+            <button onClick={goNext} style={navBtn}>
+              <i data-lucide="chevron-right" style={{ width: 18, height: 18 }}></i>
+            </button>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: 18, fontSize: 12, color: '#6b7280' }}>
+            <span style={{ color: '#15803d', fontWeight: 600 }}>✓ {knownCount} known</span> &nbsp;·&nbsp;
+            <span style={{ color: '#b91c1c', fontWeight: 600 }}>✕ {reviewCount} to review</span>
+          </div>
+        </div>
+      );
+    }
+
+    const navBtn = {
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      width: 42, height: 42, borderRadius: '50%',
+      border: '1px solid #d8dae0', background: '#fff', color: '#2d2a4a',
+      cursor: 'pointer'
+    };
+
+    const actionBtn = {
+      display: 'flex', alignItems: 'center', gap: 6,
+      padding: '10px 16px', borderRadius: 10,
+      border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer'
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+
+    // Render icons after React mounts
+    setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 100);
+  </script>
+</body>
+</html>
